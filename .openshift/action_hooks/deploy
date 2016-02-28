@@ -1,0 +1,64 @@
+#!/bin/bash
+# This deploy hook gets executed after dependencies are resolved and the
+# build hook has been run but before the application has been started back
+# up again.  This script gets executed directly, so it could be python, php,
+# ruby, etc.
+
+set -e
+
+base_version=1.26
+version=1.26.2
+
+if [ -z $OPENSHIFT_MYSQL_DB_HOST ]
+then
+    echo 1>&2
+    echo "Could not find mysql database.  Please run:" 1>&2
+    echo "rhc cartridge add -a $OPENSHIFT_APP_NAME -c mysql-5.1" 1>&2
+    echo "then make a sample commit (add whitespace somewhere) and re-push" 1>&2
+    echo 1>&2
+    exit 5
+fi
+
+# Download and extract mediawiki
+if [[ ! -d ${OPENSHIFT_DATA_DIR}/mediawiki-${version} ]]
+then
+    cd ${OPENSHIFT_DATA_DIR}
+
+    wget http://releases.wikimedia.org/mediawiki/${base_version}/mediawiki-${version}.tar.gz
+    tar xf mediawiki-${version}.tar.gz
+
+    cd - > /dev/null
+fi
+
+if [[ ! -f ${OPENSHIFT_DATA_DIR}/mediawiki_upgrade_key ]]
+then
+    echo $(date +%s | sha256sum | base64 | head -c 16 ; echo) > ${OPENSHIFT_DATA_DIR}/mediawiki_upgrade_key
+    echo "=================================================="
+    echo "  Mediawiki Upgrade Key: $(cat $OPENSHIFT_DATA_DIR/mediawiki_upgrade_key)"
+    echo "=================================================="
+fi
+
+if [[ ! -f ${OPENSHIFT_DATA_DIR}/mediawiki_secret_key ]]
+then
+    echo $(date +%s | sha256sum | base64 | head -c 64 ; echo) > ${OPENSHIFT_DATA_DIR}/mediawiki_secret_key
+fi
+
+upgrade_key=$(cat ${OPENSHIFT_DATA_DIR}/mediawiki_upgrade_key)
+secret_key=(cat ${OPENSHIFT_DATA_DIR}/mediawiki_secret_key)
+
+if [[ ! -d ${OPENSHIFT_DATA_DIR}/images ]]
+then
+    rm -f ${OPENSHIFT_DATA_DIR}/images
+    mkdir ${OPENSHIFT_DATA_DIR}/images
+fi
+
+if [[ ! -d ${OPENSHIFT_REPO_DIR}/wiki ]]
+then
+    rm -f mkdir ${OPENSHIFT_REPO_DIR}/wiki
+    mkdir ${OPENSHIFT_REPO_DIR}/wiki
+fi
+
+cp -r ${OPENSHIFT_DATA_DIR}/mediawiki-${version}/* ${OPENSHIFT_REPO_DIR}/wiki/
+
+rm -rf ${OPENSHIFT_REPO_DIR}/wiki/images
+ln -s ${OPENSHIFT_DATA_DIR}/images ${OPENSHIFT_REPO_DIR}/wiki/images
