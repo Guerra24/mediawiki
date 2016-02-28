@@ -8,19 +8,25 @@ applications. To use, just follow the quickstart below. This script is based on 
 
 1. Create an account at https://www.openshift.com
 2. Create a php application with mysql:
-	```
+
+	```bash
     $ rhc app create mediawiki php-5.4 mysql-5.5
 	```
+
 3. Add this upstream mediawiki repo
-    ```
+
+    ```bash
     $ cd mediawiki
     $ git remote add upstream -m master https://github.com/Lux-Vacuos/mediawiki.git
     $ git pull -s recursive -X theirs upstream master
 	```
+
 4. Then push the repo upstream
-    ```
+
+    ```bash
     $ git push
 	```
+
 5. That's it, you can now checkout your application at:
     http://mediawiki-$yourlogin.rhcloud.com/wiki
 
@@ -30,12 +36,15 @@ In order to update or upgrade to the latest mediawiki, you'll need to re-pull
 and re-push.
 
 1. Pull from upstream:
-	```
+
+	```bash
     $ cd mediawiki/
     $ git pull -s recursive -X theirs upstream master
 	```
+
 2. Push the new changes upstream
-	```
+
+	```bash
     $ git push
 	```
 
