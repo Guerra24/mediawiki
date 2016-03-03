@@ -30,22 +30,6 @@ then
     cd - > /dev/null
 fi
 
-if [[ ! -f ${OPENSHIFT_DATA_DIR}/mediawiki_upgrade_key ]]
-then
-    echo $(date +%s | sha256sum | base64 | head -c 16 ; echo) > ${OPENSHIFT_DATA_DIR}/mediawiki_upgrade_key
-    echo "=================================================="
-    echo "  Mediawiki Upgrade Key: $(cat $OPENSHIFT_DATA_DIR/mediawiki_upgrade_key)"
-    echo "=================================================="
-fi
-
-if [[ ! -f ${OPENSHIFT_DATA_DIR}/mediawiki_secret_key ]]
-then
-    echo $(date +%s | sha256sum | base64 | head -c 64 ; echo) > ${OPENSHIFT_DATA_DIR}/mediawiki_secret_key
-fi
-
-upgrade_key=$(cat ${OPENSHIFT_DATA_DIR}/mediawiki_upgrade_key)
-secret_key=(cat ${OPENSHIFT_DATA_DIR}/mediawiki_secret_key)
-
 if [[ ! -d ${OPENSHIFT_DATA_DIR}/images ]]
 then
     rm -f ${OPENSHIFT_DATA_DIR}/images
