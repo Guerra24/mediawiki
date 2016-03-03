@@ -50,17 +50,18 @@ and re-push.
 
 
 # Repo layout
+
 ../data - For persistent data
+
 .openshift/pear.txt - list of pears to install
+
 .openshift/action_hooks/build - Script that gets run every push, just prior to starting your app.
 
 
 # Notes about layout
 Please leave  data directory but feel free to create additional directories if needed.
 
-Note: Every time you push, everything in your remote repo dir gets recreated
-please store long term items (like an sqlite database) in ../data which will
-persist between pushes of your repo.
+Note: Every time you push, everything in your remote repo dir gets recreated please store long term items (like an sqlite database) in ../data which will persist between pushes of your repo.
 
 
 # pear.txt
